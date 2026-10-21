@@ -18,9 +18,9 @@ export default function SiteHeader({ user }) {
       <div className="wrap nav">
         <Link className="logo" href="/">Modèle<i>Financier</i></Link>
         <nav>
-          <Link href="/modeles">Modèles</Link>
-          <Link href="/parcours">Parcours</Link>
-          <Link href="/#methode">Méthode</Link>
+          <Link href="/cours">Cours</Link>
+          <Link href="/entrainement">Entraînement</Link>
+          <Link href="/certification">Certification</Link>
           <Link href="/#tarifs">Accès</Link>
         </nav>
         {user ? (

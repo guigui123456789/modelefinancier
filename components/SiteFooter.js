@@ -12,19 +12,20 @@ export default function SiteFooter() {
             </p>
           </div>
           <div>
-            <h4>Piliers</h4>
+            <h4>Cours</h4>
             <ul>
-              <li><Link href="/modeles?pilier=foundations">Foundations</Link></li>
-              <li><Link href="/modeles?pilier=valuation">Valuation</Link></li>
-              <li><Link href="/modeles?pilier=transactions">Transactions</Link></li>
-              <li><Link href="/modeles?pilier=risk-quant">Risk &amp; Quant</Link></li>
+              <li><Link href="/cours">Tous les cursus</Link></li>
+              <li><Link href="/modeles">Modélisation financière</Link></li>
+              <li><Link href="/modeles?pilier=excel-references">Excel</Link></li>
+              <li><Link href="/parcours">Les parcours</Link></li>
             </ul>
           </div>
           <div>
-            <h4>Parcours</h4>
+            <h4>Entraînement</h4>
             <ul>
-              <li><Link href="/parcours">Tous les parcours</Link></li>
-              <li><Link href="/modeles">Le catalogue</Link></li>
+              <li><Link href="/entrainement">Exercices</Link></li>
+              <li><Link href="/entrainement">Questions d&apos;entretien</Link></li>
+              <li><Link href="/certification">Certification</Link></li>
               <li><Link href="/tableau-de-bord">Ma progression</Link></li>
             </ul>
           </div>
