@@ -3,6 +3,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import ExcelExercise from './ExcelExercise';
+import Sheet from './Sheet';
+import RibbonExercise from './RibbonExercise';
+import ShortcutExercise from './ShortcutExercise';
 import { recordAnswer, completeLesson } from '@/app/excel-actions';
 
 const KIND_LABEL = {
@@ -11,7 +14,11 @@ const KIND_LABEL = {
   check: 'Contrôle',
   build: 'À vous',
   recap: 'Récapitulatif',
+  ribbon: 'Dans le ruban',
+  shortcut: 'Au clavier',
 };
+
+const INTERACTIVE = new Set(['check', 'build', 'ribbon', 'shortcut']);
 
 export default function LessonPlayer({ lessonId, lessonTitle, steps, nextLesson, signedIn }) {
   const [i, setI] = useState(0);
@@ -23,7 +30,7 @@ export default function LessonPlayer({ lessonId, lessonTitle, steps, nextLesson,
   const answered = step ? answers[step.id] : null;
 
   // Un écran de contrôle doit être résolu avant de passer au suivant.
-  const blocked = step && (step.kind === 'check' || step.kind === 'build') && !answered;
+  const blocked = step && INTERACTIVE.has(step.kind) && !answered;
 
   const go = useCallback((delta) => {
     setI((prev) => Math.min(steps.length - 1, Math.max(0, prev + delta)));
@@ -70,7 +77,7 @@ export default function LessonPlayer({ lessonId, lessonTitle, steps, nextLesson,
   if (!step) return null;
 
   const correctCount = Object.values(answers).filter((a) => a.correct).length;
-  const checkCount = steps.filter((s) => s.kind === 'check' || s.kind === 'build').length;
+  const checkCount = steps.filter((s) => INTERACTIVE.has(s.kind)).length;
 
   return (
     <div className="player">
@@ -98,6 +105,22 @@ export default function LessonPlayer({ lessonId, lessonTitle, steps, nextLesson,
 
         {step.bodyHtml && (
           <div className="prose" dangerouslySetInnerHTML={{ __html: step.bodyHtml }} />
+        )}
+
+        {step.sheet && <Sheet spec={step.sheet} />}
+
+        {step.kind === 'ribbon' && step.ribbon && (
+          <RibbonExercise
+            spec={step.ribbon}
+            onSolved={() => setAnswers((a) => ({ ...a, [step.id]: { correct: true } }))}
+          />
+        )}
+
+        {step.kind === 'shortcut' && step.shortcut && (
+          <ShortcutExercise
+            spec={step.shortcut}
+            onSolved={() => setAnswers((a) => ({ ...a, [step.id]: { correct: true } }))}
+          />
         )}
 
         {step.kind === 'check' && step.options && (

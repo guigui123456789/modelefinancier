@@ -81,6 +81,9 @@ export default async function LessonPage({ params }) {
     unit: s.unit,
     formula: s.formula,
     hint: s.hint,
+    sheet: s.sheet ?? null,
+    ribbon: s.kind === 'ribbon' ? s.exercise : null,
+    shortcut: s.kind === 'shortcut' ? s.exercise : null,
     exercise: s.exercise
       ? {
           display: s.exercise.display ?? {},

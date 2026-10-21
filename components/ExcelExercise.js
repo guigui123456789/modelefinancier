@@ -2,18 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { gradeFormula } from '@/app/excel-actions';
-
-const COLS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-
-function formatCell(v) {
-  if (v === undefined || v === null || v === '') return '';
-  if (typeof v === 'number') {
-    const abs = Math.abs(v);
-    if (abs > 0 && abs < 1) return v.toLocaleString('fr-FR', { maximumFractionDigits: 4 });
-    return v.toLocaleString('fr-FR', { maximumFractionDigits: 2 });
-  }
-  return String(v);
-}
+import Sheet from './Sheet';
 
 /**
  * Grille de travail + champ de formule.
@@ -52,45 +41,9 @@ export default function ExcelExercise({ stepId, display = {}, cells = {}, target
     }
   }
 
-  const letters = COLS.slice(0, cols);
-
   return (
     <div className="xl-exo">
-      <div className="xl-gridwrap">
-        <table className="xl-grid">
-          <thead>
-            <tr>
-              <th className="xl-corner" />
-              {letters.map((c) => <th key={c}>{c}</th>)}
-            </tr>
-          </thead>
-          <tbody>
-            {Array.from({ length: rows }, (_, r) => (
-              <tr key={r}>
-                <th className="xl-rownum">{r + 1}</th>
-                {letters.map((c) => {
-                  const ref = `${c}${r + 1}`;
-                  const raw = cells[ref];
-                  const isTarget = ref === target;
-                  const isText = typeof raw === 'string';
-                  return (
-                    <td
-                      key={ref}
-                      className={
-                        (isTarget ? 'xl-target ' : '') +
-                        (isText ? 'xl-text' : 'xl-num')
-                      }
-                      title={ref}
-                    >
-                      {isTarget ? <span className="xl-cursor">?</span> : formatCell(raw)}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <Sheet spec={{ cols, rows, cells, notes: display.notes, focus: display.focus }} target={target} />
 
       <form className="xl-bar" onSubmit={submit}>
         <span className="xl-ref">{target ?? 'fx'}</span>
