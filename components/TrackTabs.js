@@ -9,12 +9,6 @@ const LEVEL_LABEL = {
   advanced: 'Adv.',
 };
 
-const TRACK_IMAGE = {
-  'valuation-analyst': '/img/hero2.jpg',
-  ma: '/img/team.jpg',
-  'private-equity': '/img/hero3.jpg',
-  cfo: '/img/board.jpg',
-};
 
 export default function TrackTabs({ tracks }) {
   const [active, setActive] = useState(0);
@@ -80,7 +74,6 @@ export default function TrackTabs({ tracks }) {
         </ol>
 
         <aside className="aside">
-          <img src={TRACK_IMAGE[track.slug] ?? '/img/hero1.jpg'} alt="" />
           <div className="pad">
             <h3>{track.name}</h3>
             <p>{track.description}</p>

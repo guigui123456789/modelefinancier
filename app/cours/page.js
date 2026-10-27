@@ -3,93 +3,102 @@ import { createClient } from '@/lib/supabase/server';
 import { writtenLessonIds } from '@/lib/content';
 
 export const metadata = {
-  title: 'Les cours',
+  title: 'Le programme',
   description:
-    'Modélisation financière, Excel et Python pour la finance : trois cursus complets, du débutant à l’expert.',
+    'Le programme complet, matière par matière : modélisation financière, Excel et Python pour la finance.',
 };
 
-const LEVEL_NAMES = {
-  1: 'Fondations', 2: 'Fonctions', 3: 'Modélisation', 4: 'Données', 5: 'Expert',
-};
+const NIVEAUX = { 1: 'Fondations', 2: 'Fonctions', 3: 'Modélisation', 4: 'Données', 5: 'Expert' };
 
 export default async function CoursPage() {
   const supabase = createClient();
   const written = await writtenLessonIds();
   const { data: domains } = await supabase
     .from('domains')
-    .select('id, slug, name, tagline, summary, position, pillars(id, slug, name, summary, level, position, lessons(id))')
+    .select('slug, name, summary, position, pillars(slug, name, summary, level, position, lessons(id))')
     .order('position');
 
-  const lessonsOf = (p) => p.lessons ?? [];
-  const readyOf = (p) => lessonsOf(p).filter((l) => written.has(l.id)).length;
-
-  const stats = (d) => {
-    const mods = d.pillars ?? [];
-    const lessons = mods.reduce((s, p) => s + lessonsOf(p).length, 0);
-    const ready = mods.reduce((s, p) => s + readyOf(p), 0);
-    return { modules: mods.length, lessons, ready };
-  };
+  const matieres = (domains ?? []).map((d) => {
+    const modules = (d.pillars ?? [])
+      .map((p) => {
+        const lessons = p.lessons ?? [];
+        return { ...p, total: lessons.length, ready: lessons.filter((l) => written.has(l.id)).length };
+      })
+      .sort((a, b) => a.position - b.position);
+    return {
+      ...d,
+      modules,
+      total: modules.reduce((s, m) => s + m.total, 0),
+      ready: modules.reduce((s, m) => s + m.ready, 0),
+    };
+  });
 
   return (
     <section className="page">
       <div className="wrap">
         <div className="center">
-          <h1 className="page-title">Les cours</h1>
+          <h1 className="page-title">Le programme</h1>
           <p className="sub">
-            Trois cursus, du premier raccourci clavier au modèle que personne d&apos;autre
-            ne sait construire. Chaque leçon est une suite d&apos;écrans courts, avec un
-            contrôle toutes les trois notions.
+            Chaque matière se découpe en modules, chaque module en leçons. L&apos;ordre
+            est imposé : une leçon ne s&apos;ouvre qu&apos;une fois son prérequis acquis.
           </p>
         </div>
 
+        {/* Sommaire : savoir en un coup d'œil ce qui existe. */}
+        <nav className="toc">
+          {matieres.map((m) => (
+            <a className="toc-item" key={m.slug} href={`#${m.slug}`}>
+              <span className="toc-name">{m.name}</span>
+              <span className="toc-count num">
+                {m.ready} / {m.total}
+              </span>
+            </a>
+          ))}
+        </nav>
+
         <div className="domains">
-          {(domains ?? []).map((d) => {
-            const s = stats(d);
-            const byLevel = {};
-            (d.pillars ?? []).forEach((p) => {
-              (byLevel[p.level] ??= []).push(p);
-            });
-            return (
-              <article className="domain" key={d.slug}>
-                <header className="domain-head">
-                  <div>
-                    <h2>{d.name}</h2>
-                    <p className="sub" style={{ margin: '10px 0 0' }}>{d.summary}</p>
-                  </div>
-                  <span className="domain-stat">
-                    <b className="num">{s.lessons}</b>
-                    <span>
-                      leçon{s.lessons > 1 ? 's' : ''}
-                      {s.ready > 0 ? ` · ${s.ready} en ligne` : ' · à venir'}
+          {matieres.map((m) => (
+            <article className="domain" id={m.slug} key={m.slug}>
+              <header className="domain-head">
+                <div>
+                  <h2>{m.name}</h2>
+                  <p className="sub" style={{ margin: '8px 0 0', textAlign: 'left' }}>{m.summary}</p>
+                </div>
+                <span className="domain-stat">
+                  <b className="num">{m.ready}</b>
+                  <span>
+                    leçon{m.ready > 1 ? 's' : ''} en ligne sur {m.total}
+                  </span>
+                </span>
+              </header>
+
+              {m.modules.length === 0 && (
+                <p className="empty-note">Le découpage de cette matière est en cours.</p>
+              )}
+
+              {m.modules.map((p) => (
+                <Link className="module-row" key={p.slug} href={`/modeles?pilier=${p.slug}`}>
+                  <span className="module-level num" title={NIVEAUX[p.level] ?? `Niveau ${p.level}`}>
+                    N{p.level}
+                  </span>
+                  <span className="module-main">
+                    <span className="module-name">{p.name}</span>
+                    <span className="module-sum">{p.summary}</span>
+                  </span>
+                  <span className="module-tags">
+                    {p.ready > 0 ? (
+                      <span className="tag pub">{p.ready} en ligne</span>
+                    ) : (
+                      <span className="tag soon-tag">à venir</span>
+                    )}
+                    <span className="tag">
+                      {p.total} leçon{p.total > 1 ? 's' : ''}
                     </span>
                   </span>
-                </header>
-
-                {Object.keys(byLevel).sort().map((lvl) => (
-                  <div className="level" key={lvl}>
-                    <h3 className="level-title">
-                      <span className="level-no num">N{lvl}</span>
-                      {LEVEL_NAMES[lvl] ?? `Niveau ${lvl}`}
-                    </h3>
-                    <div className="modules">
-                      {byLevel[lvl]
-                        .sort((a, b) => a.position - b.position)
-                        .map((p) => (
-                          <Link className="module" key={p.slug} href={`/modeles?pilier=${p.slug}`}>
-                            <span className="mod-name">{p.name}</span>
-                            <span className="mod-sum">{p.summary}</span>
-                            <span className="mod-count num">
-                              {lessonsOf(p).length} leçon{lessonsOf(p).length > 1 ? 's' : ''}
-                              {readyOf(p) > 0 ? ` · ${readyOf(p)} en ligne` : ''}
-                            </span>
-                          </Link>
-                        ))}
-                    </div>
-                  </div>
-                ))}
-              </article>
-            );
-          })}
+                </Link>
+              ))}
+            </article>
+          ))}
         </div>
       </div>
     </section>
