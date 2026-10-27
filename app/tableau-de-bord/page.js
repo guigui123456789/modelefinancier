@@ -1,11 +1,22 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata = { title: 'Mon espace' };
 
+
+const PLAN_LABEL = {
+  free: 'lancement — tout le contenu publié est ouvert',
+  student: 'étudiant',
+  pro: 'pro',
+  team: 'équipe',
+};
+
 export default async function DashboardPage() {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  // Filet de sécurité si le middleware n'a pas pu rafraîchir la session.
+  if (!user) redirect('/connexion?suite=/tableau-de-bord');
 
   const [{ data: profile }, { data: progress }, { count: total }, { data: tracks }] =
     await Promise.all([
@@ -13,6 +24,7 @@ export default async function DashboardPage() {
       supabase
         .from('progress')
         .select('completed_at, quiz_score, lessons(slug, title, duration_min)')
+        .eq('user_id', user.id)
         .order('completed_at', { ascending: false }),
       supabase.from('lessons').select('*', { count: 'exact', head: true }).eq('published', true),
       supabase
@@ -34,7 +46,7 @@ export default async function DashboardPage() {
           {prenom ? `Bonjour ${prenom}` : 'Mon espace'}
         </h1>
         <p className="sub" style={{ margin: '18px 0 40px' }}>
-          Accès {profile?.plan === 'free' ? 'lancement — tout le catalogue est ouvert' : profile?.plan}.
+          Accès {PLAN_LABEL[profile?.plan] ?? profile?.plan ?? 'lancement'}.
         </p>
 
         <div className="dash">
@@ -101,10 +113,12 @@ export default async function DashboardPage() {
         ) : (
           <div className="gate">
             <h3>Vous n&apos;avez pas encore commencé</h3>
-            <p>Le parcours Valuation Analyst est le bon point de départ : il ne suppose rien d&apos;acquis.</p>
-            <Link className="btn btn-w" href="/modeles/trois-etats-financiers">
-              Commencer la première leçon
-            </Link>
+            <p>
+              La leçon Discounted Cash Flow est complète et montre le format : seize
+              écrans, des contrôles, et une feuille de calcul à chaque fois qu&apos;on
+              nomme une cellule.
+            </p>
+            <Link className="btn btn-w" href="/modeles/dcf">Commencer la première leçon</Link>
           </div>
         )}
       </div>

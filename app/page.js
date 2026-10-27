@@ -4,6 +4,7 @@ import Reveal from '@/components/Reveal';
 import DcfDemo from '@/components/DcfDemo';
 import TrackTabs from '@/components/TrackTabs';
 import WaitlistForm from '@/components/WaitlistForm';
+import { siteCounts } from '@/lib/content';
 
 export const revalidate = 300;
 
@@ -30,26 +31,32 @@ async function getTracks() {
   }));
 }
 
-async function getPillars() {
+async function getDomains() {
   const supabase = createClient();
   const { data } = await supabase
-    .from('pillars')
-    .select('slug, name, summary, position, lessons(count)')
+    .from('domains')
+    .select('slug, name, tagline, summary, position, pillars(slug, lessons(count))')
     .order('position');
-  return data ?? [];
+
+  return (data ?? []).map((d) => ({
+    ...d,
+    modules: (d.pillars ?? []).length,
+    lessons: (d.pillars ?? []).reduce((s, p) => s + (p.lessons?.[0]?.count ?? 0), 0),
+  }));
 }
 
 export default async function HomePage() {
-  const [tracks, pillars] = await Promise.all([getTracks(), getPillars()]);
+  const [tracks, domains, counts] = await Promise.all([getTracks(), getDomains(), siteCounts()]);
 
   return (
     <>
       <section className="hero">
         <div className="wrap">
-          <Reveal as="h1">Bien plus qu&apos;un cours de finance</Reveal>
+          <Reveal as="h1">Apprendre la finance technique. Et le prouver.</Reveal>
           <Reveal as="p" className="sub" delay={90}>
-            Tous les modèles financiers du métier, construits ligne par ligne, avec le
-            template Excel qui va avec. Inscription gratuite en une minute.
+            Modélisation financière, Excel et Python pour la finance : des leçons courtes,
+            des exercices corrigés formule par formule, et une certification exigeante au
+            bout. En français, avec la terminologie du métier.
           </Reveal>
           <Reveal className="cta-row" delay={180}>
             <Link className="btn btn-w" href="/inscription">Commencer gratuitement</Link>
@@ -124,12 +131,12 @@ export default async function HomePage() {
               commet à cet endroit.
             </Reveal>
             <Reveal className="kpis" delay={180}>
-              <div><b>48</b><span>modèles</span></div>
-              <div><b>{tracks.length || 6}</b><span>parcours</span></div>
-              <div><b>100 %</b><span>templates Excel</span></div>
+              <div><b>{counts.modules}</b><span>modules</span></div>
+              <div><b>{counts.lessons}</b><span>leçons au programme</span></div>
+              <div><b>{counts.tracks}</b><span>parcours métiers</span></div>
             </Reveal>
             <Reveal delay={270}>
-              <Link className="btn btn-k" href="/modeles">Voir le catalogue</Link>
+              <Link className="btn btn-k" href="/cours">Voir le programme</Link>
             </Reveal>
           </div>
         </div>
@@ -138,20 +145,22 @@ export default async function HomePage() {
       <section id="piliers">
         <div className="wrap">
           <div className="center">
-            <Reveal as="h2">Six piliers, quarante-huit modèles</Reveal>
+            <Reveal as="h2">Trois domaines, {counts.modules} modules</Reveal>
             <Reveal as="p" className="sub" delay={90}>
-              Chaque modèle occupe une case unique : un pilier, un niveau. Aucun modèle
-              avancé ne s&apos;ouvre avant son prérequis.
+              Chaque leçon occupe une case unique : un module, un niveau. Aucune leçon
+              avancée ne s&apos;ouvre avant son prérequis.
             </Reveal>
           </div>
           <div className="cards">
-            {pillars.map((p, i) => (
-              <Reveal as="article" className="card" key={p.slug} delay={(i % 3) * 90}>
-                <h3>{p.name}</h3>
-                <p>{p.summary}</p>
+            {domains.map((d, i) => (
+              <Reveal as="article" className="card" key={d.slug} delay={(i % 3) * 90}>
+                <h3>{d.name}</h3>
+                <p>{d.summary ?? d.tagline}</p>
                 <div className="meta">
-                  <Link className="cnt" href={`/modeles?pilier=${p.slug}`}>
-                    {p.lessons?.[0]?.count ?? 0} leçons
+                  <Link className="cnt" href="/cours">
+                    {d.lessons > 0
+                      ? `${d.modules} modules · ${d.lessons} leçons`
+                      : `${d.modules} modules · programme en préparation`}
                   </Link>
                   {ARROW}
                 </div>
@@ -168,11 +177,11 @@ export default async function HomePage() {
           </Reveal>
           <div>
             <Reveal as="span" className="eyebrow">La méthode</Reveal>
-            <Reveal as="h2" delay={90}>La même structure, dans chaque leçon</Reveal>
+            <Reveal as="h2" delay={90}>Des écrans courts, un contrôle toutes les trois notions</Reveal>
             <Reveal as="p" delay={180}>
-              Vous savez toujours où trouver l&apos;intuition, où trouver la formule, et où
-              trouver le piège. Quarante minutes par leçon, un template à la fin, un quiz
-              qui débloque la suivante.
+              Pas de page de 2 000 mots qu&apos;on survole. Une idée par écran, une feuille
+              de calcul dès qu&apos;on nomme une cellule, et un contrôle qui ne laisse pas
+              passer une notion mal comprise.
             </Reveal>
             <Reveal delay={270}>
               <Link className="btn btn-k" href="/modeles/dcf">Voir une leçon</Link>
@@ -189,14 +198,15 @@ export default async function HomePage() {
           <Reveal as="article" className="stepc" delay={90}>
             <span className="n">02</span>
             <h3>La construction, ligne par ligne</h3>
-            <p>Une étape par ligne du modèle : ce qu&apos;on écrit, la formule en anglais,
-              pourquoi, et l&apos;erreur fréquente à cet endroit précis.</p>
+            <p>Une étape par ligne du modèle : ce qu&apos;on écrit, la formule sous son nom
+              français et anglais, pourquoi, et l&apos;erreur fréquente à cet endroit.</p>
           </Reveal>
           <Reveal as="article" className="stepc" delay={180}>
             <span className="n">03</span>
-            <h3>Le template et le quiz</h3>
-            <p>Un fichier Excel commenté, hypothèses isolées, aucune valeur codée en dur.
-              Cinq questions valident la leçon et débloquent la suivante.</p>
+            <h3>Une correction qui exécute vos formules</h3>
+            <p>Vous écrivez votre formule dans une vraie grille. Elle est exécutée, pas
+              comparée à un texte : toute écriture juste est acceptée, une valeur constatée
+              est refusée.</p>
           </Reveal>
         </div>
       </section>
@@ -204,7 +214,7 @@ export default async function HomePage() {
       <section id="demo">
         <div className="wrap">
           <div className="center">
-            <Reveal as="span" className="eyebrow">Leçon 12 — Discounted Cash Flow</Reveal>
+            <Reveal as="span" className="eyebrow">Leçon — Discounted Cash Flow</Reveal>
             <Reveal as="h2" delay={90}>Bougez une hypothèse, la valorisation suit</Reveal>
             <Reveal as="p" className="sub" delay={180}>
               Free cash flow de départ : 806 M€, projeté sur cinq ans, terminal value par
@@ -215,13 +225,35 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="dark2" id="parcours">
+      <section className="dark2" id="certification">
+        <div className="wrap split">
+          <div>
+            <Reveal as="span" className="eyebrow">En préparation</Reveal>
+            <Reveal as="h2" delay={90}>Un examen difficile, dont la réussite se vérifie</Reveal>
+            <Reveal as="p" className="sub" delay={180}>
+              Les cours s&apos;apprennent partout. Ce qui manque, c&apos;est la preuve.
+              La certification vise moins de 40 % de réussite, tire les paramètres de
+              chaque candidat au hasard, et délivre une référence que n&apos;importe qui
+              peut vérifier en ligne.
+            </Reveal>
+            <Reveal className="cta-row" delay={270}>
+              <Link className="btn btn-w" href="/certification">Le format de l&apos;examen</Link>
+              <Link className="btn btn-o" href="/verification">Vérifier un certificat</Link>
+            </Reveal>
+          </div>
+          <Reveal className="shot" delay={90}>
+            <img src="/img/team.jpg" alt="Session de travail autour d'un modèle financier" />
+          </Reveal>
+        </div>
+      </section>
+
+      <section id="parcours">
         <div className="wrap">
           <div className="center">
             <Reveal as="h2">Suivez un ordre, pas un catalogue</Reveal>
             <Reveal as="p" className="sub" delay={90}>
-              Personne ne finit une liste de quarante-huit modèles. Tout le monde finit un
-              parcours de huit, avec un objectif métier au bout.
+              Personne ne finit une liste de {counts.lessons} leçons. Tout le monde finit
+              un parcours, avec un objectif métier au bout.
             </Reveal>
           </div>
           <Reveal><TrackTabs tracks={tracks} /></Reveal>
@@ -242,10 +274,10 @@ export default async function HomePage() {
               <span className="badge">Disponible</span>
               <h3>Lancement</h3>
               <p className="price">Gratuit</p>
-              <p>L&apos;intégralité du site, sans carte bancaire. Une adresse email suffit.</p>
+              <p>L&apos;intégralité du contenu publié, sans carte bancaire. Une adresse email suffit.</p>
               <ul>
-                <li>Les 48 modèles, tous niveaux</li>
-                <li>Tous les templates Excel</li>
+                <li>Toutes les leçons publiées, tous niveaux</li>
+                <li>Les exercices corrigés automatiquement</li>
                 <li>Suivi de progression</li>
               </ul>
               <div className="meta">{ARROW}</div>
@@ -262,8 +294,8 @@ export default async function HomePage() {
               <p className="price">Bientôt</p>
               <p>Pour celles et ceux qui modélisent au quotidien et veulent les cas réels.</p>
               <ul>
-                <li>Modèles avancés</li><li>Certificats de parcours</li>
-                <li>Mises à jour des templates</li>
+                <li>Leçons avancées</li><li>Examens blancs</li>
+                <li>Passage de la certification</li>
               </ul>
               <div className="meta">{ARROW}</div>
             </Reveal>
@@ -293,7 +325,7 @@ export default async function HomePage() {
 
       <section className="light" id="inscription">
         <div className="wrap center" style={{ marginBottom: 0 }}>
-          <Reveal as="h2">Rejoignez les premiers inscrits de modelefinancier.com</Reveal>
+          <Reveal as="h2">Rejoignez les premiers inscrits</Reveal>
           <Reveal as="p" className="sub" delay={90}>
             Accès complet pendant le lancement. Pas de carte bancaire, pas d&apos;engagement.
           </Reveal>

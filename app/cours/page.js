@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { writtenLessonIds } from '@/lib/content';
 
 export const metadata = {
   title: 'Les cours',
@@ -13,15 +14,20 @@ const LEVEL_NAMES = {
 
 export default async function CoursPage() {
   const supabase = createClient();
+  const written = await writtenLessonIds();
   const { data: domains } = await supabase
     .from('domains')
-    .select('id, slug, name, tagline, summary, position, pillars(id, slug, name, summary, level, position, lessons(count))')
+    .select('id, slug, name, tagline, summary, position, pillars(id, slug, name, summary, level, position, lessons(id))')
     .order('position');
+
+  const lessonsOf = (p) => p.lessons ?? [];
+  const readyOf = (p) => lessonsOf(p).filter((l) => written.has(l.id)).length;
 
   const stats = (d) => {
     const mods = d.pillars ?? [];
-    const lessons = mods.reduce((s, p) => s + (p.lessons?.[0]?.count ?? 0), 0);
-    return { modules: mods.length, lessons };
+    const lessons = mods.reduce((s, p) => s + lessonsOf(p).length, 0);
+    const ready = mods.reduce((s, p) => s + readyOf(p), 0);
+    return { modules: mods.length, lessons, ready };
   };
 
   return (
@@ -52,7 +58,7 @@ export default async function CoursPage() {
                   </div>
                   <span className="domain-stat">
                     <b className="num">{s.lessons}</b>
-                    <span>leçons</span>
+                    <span>leçons · {s.ready} disponible{s.ready > 1 ? 's' : ''}</span>
                   </span>
                 </header>
 
@@ -69,7 +75,10 @@ export default async function CoursPage() {
                           <Link className="module" key={p.slug} href={`/modeles?pilier=${p.slug}`}>
                             <span className="mod-name">{p.name}</span>
                             <span className="mod-sum">{p.summary}</span>
-                            <span className="mod-count num">{p.lessons?.[0]?.count ?? 0} leçons</span>
+                            <span className="mod-count num">
+                              {lessonsOf(p).length} leçons
+                              {readyOf(p) > 0 ? ` · ${readyOf(p)} en ligne` : ''}
+                            </span>
                           </Link>
                         ))}
                     </div>

@@ -20,6 +20,7 @@ export default function SiteHeader({ user }) {
         <nav>
           <Link href="/cours">Cours</Link>
           <Link href="/entrainement">Entraînement</Link>
+          <Link className="hide-s" href="/parcours">Parcours</Link>
           <Link href="/certification">Certification</Link>
           <Link href="/#tarifs">Accès</Link>
         </nav>

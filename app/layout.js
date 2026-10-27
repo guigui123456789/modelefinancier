@@ -6,11 +6,12 @@ import SiteFooter from '@/components/SiteFooter';
 export const metadata = {
   metadataBase: new URL('https://modelefinancier.com'),
   title: {
-    default: 'Modèle Financier — tous les modèles financiers expliqués pas à pas',
+    default: 'Modèle Financier — modélisation financière, Excel et Python, en français',
     template: '%s · Modèle Financier',
   },
   description:
-    "Tous les modèles financiers du métier, construits ligne par ligne, avec le template Excel qui va avec. DCF, LBO, merger model, Three-Statement Model.",
+    "Apprendre la finance technique et le prouver : leçons courtes, exercices corrigés formule par formule, et une certification exigeante. DCF, LBO, merger model, Excel, Python.",
+  alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
     locale: 'fr_FR',

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/server';
 
 export const metadata = {
   title: 'La certification',
@@ -15,7 +16,22 @@ const SPECS = [
   ['Validité', 'à vie, vérifiable en ligne'],
 ];
 
-export default function CertificationPage() {
+export default async function CertificationPage() {
+  const supabase = createClient();
+  const { data: domains } = await supabase
+    .from('domains')
+    .select('slug, name, pillars(lessons(count))')
+    .order('position');
+
+  const programme = Object.fromEntries(
+    (domains ?? []).map((d) => [
+      d.slug,
+      (d.pillars ?? []).reduce((s, p) => s + (p.lessons?.[0]?.count ?? 0), 0),
+    ])
+  );
+  const auProgramme = (slug) =>
+    programme[slug] ? `${programme[slug]} leçons au programme` : 'programme en cours';
+
   return (
     <section className="page">
       <div className="wrap">
@@ -66,7 +82,7 @@ export default function CertificationPage() {
               Du raccourci clavier au modèle circulaire. Construction notée sur fichier,
               pas sur QCM.
             </p>
-            <div className="meta"><span className="cnt">133 leçons au programme</span></div>
+            <div className="meta"><span className="cnt">{auProgramme('excel')}</span></div>
           </article>
           <article className="card">
             <h3>Modélisation financière</h3>
@@ -74,7 +90,7 @@ export default function CertificationPage() {
               Three-Statement, DCF, LBO, merger model. Un modèle complet à livrer en
               temps limité.
             </p>
-            <div className="meta"><span className="cnt">48 modèles au programme</span></div>
+            <div className="meta"><span className="cnt">{auProgramme('modelisation')}</span></div>
           </article>
           <article className="card">
             <h3>Python pour la finance</h3>
@@ -82,7 +98,7 @@ export default function CertificationPage() {
               Code exécuté contre une suite de tests cachés. On ne note pas le style,
               on note ce qui tourne.
             </p>
-            <div className="meta"><span className="cnt">programme en cours</span></div>
+            <div className="meta"><span className="cnt">{auProgramme('python')}</span></div>
           </article>
         </div>
 
@@ -93,7 +109,10 @@ export default function CertificationPage() {
             contenu partiel détruirait sa crédibilité avant même qu&apos;elle existe.
             Les inscrits seront prévenus en premier.
           </p>
-          <Link className="btn btn-w" href="/inscription">Être prévenu de l&apos;ouverture</Link>
+          <div className="cta-row" style={{ justifyContent: 'center' }}>
+            <Link className="btn btn-w" href="/inscription">Être prévenu de l&apos;ouverture</Link>
+            <Link className="btn btn-o" href="/verification">Vérifier un certificat</Link>
+          </div>
         </div>
       </div>
     </section>
