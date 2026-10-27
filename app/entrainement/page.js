@@ -26,7 +26,7 @@ export default async function EntrainementPage() {
     <section className="page">
       <div className="wrap">
         <div className="center">
-          <h1 style={{ fontSize: 'clamp(34px,5.4vw,58px)' }}>Entraînement</h1>
+          <h1 className="page-title">Entraînement</h1>
           <p className="sub">
             Les cours enseignent. L&apos;entraînement vérifie que ça tient sous pression :
             exercices corrigés à la formule près, questions d&apos;entretien réelles,
@@ -77,7 +77,7 @@ export default async function EntrainementPage() {
         {nbQuestions > 0 && (
           <>
             <div className="center" style={{ marginBottom: 24 }}>
-              <h2 style={{ fontSize: 'clamp(24px,3.4vw,36px)' }}>Quelques questions</h2>
+              <h2 className="section-title">Quelques questions</h2>
             </div>
             <div className="catalogue" style={{ marginBottom: 'clamp(40px,6vw,64px)' }}>
               {questions.map((q) => (
@@ -95,7 +95,7 @@ export default async function EntrainementPage() {
         {mocks.length > 0 && (
           <>
             <div className="center" style={{ marginBottom: 24 }}>
-              <h2 style={{ fontSize: 'clamp(24px,3.4vw,36px)' }}>Les examens blancs</h2>
+              <h2 className="section-title">Les examens blancs</h2>
             </div>
             <div className="catalogue" style={{ marginBottom: 'clamp(40px,6vw,64px)' }}>
               {mocks.map((e) => (
@@ -115,7 +115,7 @@ export default async function EntrainementPage() {
         )}
 
         <div className="center" style={{ marginBottom: 24 }}>
-          <h2 style={{ fontSize: 'clamp(24px,3.4vw,36px)' }}>Les leçons qui contiennent des exercices</h2>
+          <h2 className="section-title">Les leçons qui contiennent des exercices</h2>
           <p className="sub">
             Toutes en accès libre. La correction tourne côté serveur : la solution ne
             descend jamais dans votre navigateur.

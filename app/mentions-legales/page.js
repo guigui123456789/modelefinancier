@@ -10,7 +10,7 @@ export default function MentionsPage() {
     <section className="page">
       <div className="wrap">
         <div className="center">
-          <h1 style={{ fontSize: 'clamp(32px,4.6vw,50px)' }}>Mentions légales</h1>
+          <h1 className="page-title">Mentions légales</h1>
         </div>
         <div className="prose">
           <h2>Éditeur du site</h2>

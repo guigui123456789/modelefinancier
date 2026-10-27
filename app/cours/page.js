@@ -34,7 +34,7 @@ export default async function CoursPage() {
     <section className="page">
       <div className="wrap">
         <div className="center">
-          <h1 style={{ fontSize: 'clamp(34px,5.4vw,58px)' }}>Les cours</h1>
+          <h1 className="page-title">Les cours</h1>
           <p className="sub">
             Trois cursus, du premier raccourci clavier au modèle que personne d&apos;autre
             ne sait construire. Chaque leçon est une suite d&apos;écrans courts, avec un
@@ -58,7 +58,10 @@ export default async function CoursPage() {
                   </div>
                   <span className="domain-stat">
                     <b className="num">{s.lessons}</b>
-                    <span>leçons · {s.ready} disponible{s.ready > 1 ? 's' : ''}</span>
+                    <span>
+                      leçon{s.lessons > 1 ? 's' : ''}
+                      {s.ready > 0 ? ` · ${s.ready} en ligne` : ' · à venir'}
+                    </span>
                   </span>
                 </header>
 
@@ -76,7 +79,7 @@ export default async function CoursPage() {
                             <span className="mod-name">{p.name}</span>
                             <span className="mod-sum">{p.summary}</span>
                             <span className="mod-count num">
-                              {lessonsOf(p).length} leçons
+                              {lessonsOf(p).length} leçon{lessonsOf(p).length > 1 ? 's' : ''}
                               {readyOf(p) > 0 ? ` · ${readyOf(p)} en ligne` : ''}
                             </span>
                           </Link>

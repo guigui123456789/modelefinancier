@@ -1,7 +1,26 @@
+import { Inter_Tight, IBM_Plex_Mono } from 'next/font/google';
 import './globals.css';
+
 import { createClient } from '@/lib/supabase/server';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
+
+// Polices auto-hébergées par Next : aucun appel réseau au rendu, aucun saut de
+// mise en page. Inter Tight tient les grandes tailles avec un crénage serré ;
+// Plex Mono porte tous les chiffres, qui sont la matière du site.
+const display = Inter_Tight({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-inter-tight',
+  display: 'swap',
+});
+
+const mono = IBM_Plex_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-ibm-plex-mono',
+  display: 'swap',
+});
 
 export const metadata = {
   metadataBase: new URL('https://modelefinancier.com'),
@@ -24,7 +43,7 @@ export default async function RootLayout({ children }) {
   const { data: { user } } = await supabase.auth.getUser();
 
   return (
-    <html lang="fr">
+    <html lang="fr" className={`${display.variable} ${mono.variable}`}>
       <body>
         <div className="promo">
           Accès libre pendant la phase de lancement. <b>modelefinancier.com</b>

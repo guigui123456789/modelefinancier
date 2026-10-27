@@ -23,7 +23,7 @@ export default async function VerificationPage({ searchParams }) {
     <section className="page">
       <div className="wrap">
         <div className="center">
-          <h1 style={{ fontSize: 'clamp(34px,5.4vw,58px)' }}>Vérifier un certificat</h1>
+          <h1 className="page-title">Vérifier un certificat</h1>
           <p className="sub">
             Chaque certificat porte une référence unique. Saisissez-la pour confirmer
             qu&apos;elle correspond bien à un examen réussi. Aucun compte n&apos;est

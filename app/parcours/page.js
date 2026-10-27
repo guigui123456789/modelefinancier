@@ -27,7 +27,7 @@ export default async function ParcoursPage() {
     <section className="page">
       <div className="wrap">
         <div className="center">
-          <h1 style={{ fontSize: 'clamp(34px,5.4vw,58px)' }}>Les parcours</h1>
+          <h1 className="page-title">Les parcours</h1>
           <p className="sub">
             Une suite ordonnée de leçons avec un objectif métier au bout, plutôt qu&apos;un
             catalogue dans lequel se perdre.

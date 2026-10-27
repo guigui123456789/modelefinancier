@@ -37,7 +37,7 @@ export default async function CertificationPage() {
       <div className="wrap">
         <div className="center">
           <span className="eyebrow">En préparation</span>
-          <h1 style={{ fontSize: 'clamp(34px,5.4vw,58px)' }}>La certification</h1>
+          <h1 className="page-title">La certification</h1>
           <p className="sub">
             Un certificat ne vaut que par la difficulté de l&apos;examen qui le délivre.
             Celui-ci est conçu pour être dur, et pour qu&apos;une réussite veuille dire
@@ -47,7 +47,7 @@ export default async function CertificationPage() {
 
         <div className="split" style={{ marginBottom: 'clamp(44px,6vw,72px)' }}>
           <div>
-            <h2 style={{ fontSize: 'clamp(26px,3.6vw,38px)' }}>
+            <h2 className="section-title">
               Pourquoi les réponses ne circuleront pas
             </h2>
             <p style={{ marginTop: 18, color: 'var(--dim)' }}>
@@ -73,7 +73,7 @@ export default async function CertificationPage() {
         </div>
 
         <div className="center">
-          <h2 style={{ fontSize: 'clamp(24px,3.4vw,36px)' }}>Les trois certifications prévues</h2>
+          <h2 className="section-title">Les trois certifications prévues</h2>
         </div>
         <div className="cards">
           <article className="card">

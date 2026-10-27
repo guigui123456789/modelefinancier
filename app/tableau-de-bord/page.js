@@ -42,7 +42,7 @@ export default async function DashboardPage() {
   return (
     <section className="page">
       <div className="wrap">
-        <h1 style={{ fontSize: 'clamp(30px,4.6vw,48px)' }}>
+        <h1 className="page-title">
           {prenom ? `Bonjour ${prenom}` : 'Mon espace'}
         </h1>
         <p className="sub" style={{ margin: '18px 0 40px' }}>
@@ -74,7 +74,7 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <h2 style={{ fontSize: '1.7rem', marginBottom: 20 }}>Vos parcours</h2>
+        <h2 className="section-title" style={{ marginBottom: 18 }}>Vos parcours</h2>
         <div className="catalogue" style={{ marginBottom: 46 }}>
           {(tracks ?? []).map((t) => {
             const slugs = (t.track_lessons ?? []).map((tl) => tl.lessons?.slug).filter(Boolean);
@@ -95,7 +95,7 @@ export default async function DashboardPage() {
           })}
         </div>
 
-        <h2 style={{ fontSize: '1.7rem', marginBottom: 20 }}>Dernières leçons terminées</h2>
+        <h2 className="section-title" style={{ marginBottom: 18 }}>Dernières leçons terminées</h2>
         {done.length ? (
           <div className="catalogue">
             {done.slice(0, 8).map((p) => (

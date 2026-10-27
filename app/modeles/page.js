@@ -70,7 +70,7 @@ export default async function CataloguePage({ searchParams }) {
     <section className="page">
       <div className="wrap">
         <div className="center">
-          <h1 style={{ fontSize: 'clamp(34px,5.4vw,58px)' }}>Le catalogue</h1>
+          <h1 className="page-title">Le catalogue</h1>
           <p className="sub">
             Le programme complet est arrêté ; les leçons se publient au fil de leur
             écriture. Celles marquées <b>Disponible</b> sont lisibles maintenant.
