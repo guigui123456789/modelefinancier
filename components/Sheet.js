@@ -15,6 +15,12 @@ export function formatCell(v) {
   if (v === undefined || v === null || v === '') return '';
   if (typeof v === 'number') {
     const abs = Math.abs(v);
+    // Les très petites valeurs — frais unitaires, points de base — étaient
+    // arrondies à « 0 », ce qui rendait l'énoncé incompréhensible. On garde
+    // assez de décimales pour voir les chiffres significatifs.
+    if (abs > 0 && abs < 0.001) {
+      return v.toLocaleString('fr-FR', { maximumSignificantDigits: 3 });
+    }
     if (abs > 0 && abs < 1) {
       return v.toLocaleString('fr-FR', { maximumFractionDigits: 4 });
     }
